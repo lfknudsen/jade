@@ -2,9 +2,11 @@ package main
 
 import (
 	"database/sql"
+	. "fmt"
 	"log"
 	"os"
 	"os/exec"
+	"strings"
 
 	_ "github.com/lib/pq"
 )
@@ -18,7 +20,15 @@ func main() {
 		}
 	}
 
-	db, err := sql.Open("postgres", "user=postgres host=localhost dbname=postgres connect_timeout=5 port=5432 sslmode=disable password=abc123")
+	args := []string{
+		"user=postgres", is("password", os.Getenv("JADE_DB_PASSWORD")),
+		"host=localhost", is("port", os.Getenv("JADE_DB_PORT")),
+		"dbname=postgres",
+		"connect_timeout=5",
+		"sslmode=disable",
+	}
+
+	db, err := sql.Open("postgres", strings.Join(args, " "))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -29,11 +39,19 @@ func main() {
 func startServer() {
 	err := exec.Command("docker", "run",
 		"-d",
+		// remove container entirely when closed. Only for testing.
 		"--rm",
-		"-p", "5432:5432",
-		"-e", "POSTGRES_PASSWORD=abc123",
+		// Bind host machine port to container port.
+		"-p", Sprintf("%s:5432", os.Getenv("JANE_DB_PORT")),
+		// Set the environment variable that determines the user's password.
+		"-e", is("POSTGRES_PASSWORD", os.Getenv("JADE_DB_PASSWORD")),
 	).Run()
 	if err != nil {
 		log.Fatal(err)
 	}
+}
+
+// is is a convenience function for assembling a key-value pair.
+func is(key string, val string) string {
+	return Sprintf("%s=%s", key, val)
 }
