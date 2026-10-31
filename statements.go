@@ -31,3 +31,22 @@ CREATE TABLE IF NOT EXISTS subdirectory (
 	child VARCHAR REFERENCES folder ON DELETE CASCADE,
 	CONSTRAINT parent_subdirectory_relation PRIMARY KEY (parent, child)
 );`
+
+const insertFolder = `
+INSERT INTO folder VALUES ($1, $2, $3);
+`
+
+const insertRootFolder = `
+INSERT INTO folder (uuid, name) VALUES ($1, $2);
+`
+const insertFile = `
+INSERT INTO file VALUES ($1, $2, $3);
+`
+
+const insertFolderRelation = `
+INSERT INTO subdirectory VALUES ($1, $2);
+`
+
+const insertChildRelation = `
+INSERT INTO child VALUES ($1, $2);
+`
