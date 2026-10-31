@@ -7,7 +7,6 @@ import (
 
 func initDatabase(db *sql.DB) {
 	tx := newTx(db)
-	defer rollback(tx)
 	execStmt(dropTables, tx)
 	execStmt(createTables, tx)
 	commit(tx)
