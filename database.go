@@ -14,17 +14,11 @@ func initDatabase(db *sql.DB) {
 }
 
 func execStmt(query string, tx *sql.Tx) {
-	stmt, err := tx.Prepare(query)
+	_, err := tx.Exec(query)
 	if err != nil {
 		rollback(tx)
 		log.Fatal(err)
 	}
-	if _, err = stmt.Exec(); err != nil {
-		closeStmt(stmt)
-		rollback(tx)
-		log.Fatal(err)
-	}
-	closeStmt(stmt)
 }
 
 func closeDB(db *sql.DB) {
