@@ -60,33 +60,33 @@ func insert(db *sql.DB, folders []Folder, files []File) (rows int64) {
 	}
 	for _, f := range folders {
 		statementText := insertRootFolder
-		args := []string{f.uuid, f.name}
+		args := []any{f.uuid, f.name}
 		if f.parent != nil {
 			statementText = insertFolder
 			args = append(args, *f.parent)
 		}
 		rows += Exec(tx, statementText, args)
 		if f.parent != nil {
-			rows += Exec(tx, insertFolderRelation, []string{*f.parent, f.uuid})
+			rows += Exec(tx, insertFolderRelation, []any{*f.parent, f.uuid})
 		}
 	}
 
 	for _, f := range files {
-		args := []string{f.uuid, f.name, f.parent}
+		args := []any{f.uuid, f.name, f.parent}
 		rows += Exec(tx, insertFile, args)
-		rows += Exec(tx, insertChildRelation, []string{f.parent, f.uuid})
+		rows += Exec(tx, insertChildRelation, []any{f.parent, f.uuid})
 	}
 	commit(tx)
 	return rows
 }
 
-func Exec(tx *sql.Tx, statementText string, args []string) (rows int64) {
+func Exec(tx *sql.Tx, statementText string, args []any) (rows int64) {
 	stmt, err := tx.Prepare(statementText)
 	if err != nil {
 		rollback(tx)
 		log.Fatal(err)
 	}
-	res, err := stmt.Exec(args)
+	res, err := stmt.Exec(args...)
 	if err != nil {
 		closeStmt(stmt)
 		rollback(tx)

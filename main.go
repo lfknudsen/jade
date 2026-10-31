@@ -57,7 +57,9 @@ func connect() (*sql.DB, error) {
 		"connect_timeout=5",
 		"sslmode=disable",
 	}
-	return sql.Open("postgres", strings.Join(args, " "))
+	argString := strings.Join(args, " ")
+	Println("Arguments for postgres:", argString)
+	return sql.Open("postgres", argString)
 }
 
 func startServer() {
