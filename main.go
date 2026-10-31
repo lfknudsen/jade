@@ -18,7 +18,7 @@ func main() {
 		}
 	}
 
-	db, err := sql.Open("postgres", "host=localhost dbname=postgres connect_timeout=5 port=5432")
+	db, err := sql.Open("postgres", "user=postgres host=localhost dbname=postgres connect_timeout=5 port=5432 sslmode=disable password=abc123")
 	if err != nil {
 		log.Fatal(err)
 	}
