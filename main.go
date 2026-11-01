@@ -8,6 +8,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strings"
+	"time"
 	"uuid"
 
 	_ "github.com/lib/pq"
@@ -41,11 +42,17 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
+		beforeLoadingStructs := time.Now()
 		folders, files, err := loadDir(abs, nil)
+		afterLoadingStructs := time.Now()
 		if err != nil {
 			log.Fatal(err)
 		}
-		insert(db, folders, files)
+		rows := insert(db, folders, files)
+		afterInsertion := time.Now()
+		Printf("Unmarshalling structs: %v", afterLoadingStructs.Sub(beforeLoadingStructs))
+		Printf("\t\tInserting: %v\n", afterInsertion.Sub(afterLoadingStructs))
+		Printf("%d rows were altered.\n", rows)
 	}
 }
 
@@ -58,7 +65,6 @@ func connect() (*sql.DB, error) {
 		"sslmode=disable",
 	}
 	argString := strings.Join(args, " ")
-	Println("Arguments for postgres:", argString)
 	return sql.Open("postgres", argString)
 }
 
