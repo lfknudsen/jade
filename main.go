@@ -74,7 +74,7 @@ func startServer() {
 		// remove container entirely when closed. For testing.
 		"--rm",
 		// Bind host machine port to container port.
-		"-p", Sprintf("%s:5432", os.Getenv("JANE_DB_PORT")),
+		"-p", Sprintf("%s:5432", os.Getenv("JADE_DB_PORT")),
 		// Set the environment variable that determines the user's password.
 		"-e", is("POSTGRES_PASSWORD", os.Getenv("JADE_DB_PASSWORD")),
 	).Run()
